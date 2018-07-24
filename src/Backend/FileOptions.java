@@ -2,11 +2,9 @@ package Backend;
 
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -14,22 +12,6 @@ public class FileOptions {
 
     Stage stage = new Stage();
     File lastFile = null;
-
-    /**
-     *
-     * @param text the text file you are wishing ot save
-     * @return a File object of the TextFile saved.
-     */
-    public File saveTextFileAs(String text){
-        final FileChooser fileChooser = new FileChooser();
-        File selectedDirectory;
-        fileChooser.setTitle("Save As");
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Text Files (*.txt)", new String[]{"*.txt"});
-        fileChooser.getExtensionFilters().add(extFilter);
-        selectedDirectory = fileChooser.showSaveDialog(stage);
-        return selectedDirectory;
-
-    }
 
     public ArrayList<File> openTextFiles(){
         final FileChooser fileChooser = new FileChooser();
@@ -41,7 +23,7 @@ public class FileOptions {
         return arrayList;
     }
 
-    public String getStringFromTextDoc(File file){
+    public String getStringFromTextFile(File file){
         String words;
         try {
             return  words = new Scanner(file).useDelimiter("\\A").next();
@@ -52,21 +34,31 @@ public class FileOptions {
         return "";
     }
 
-    public File getLastFile(){
-        return lastFile;
+    /**
+     * Will do the same as saveTextFile but will queuery the user
+     * @param content the content file you are wishing ot save
+     * @return a File object of the TextFile saved.
+     */
+    public File saveTextFileAs(String content) throws IOException {
+        final FileChooser fileChooser = new FileChooser();
+        File selectedDirectory;
+        fileChooser.setTitle("Save As");
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Text Files (*.txt)", new String[]{"*.txt"});
+        fileChooser.getExtensionFilters().add(extFilter);
+        selectedDirectory = fileChooser.showSaveDialog(stage);
+
+        System.out.println(selectedDirectory.getAbsolutePath());
+        //saveTextFile(selectedDirectory.getAbsolutePath(), content);
+
+        return selectedDirectory;
+
     }
 
-
-    private void SaveTextFile(File file, String content){
-        try {
-            PrintWriter fstream = new PrintWriter(new FileWriter(file));
+    public void saveTextFile(String filepath, String content) throws IOException {
+            PrintWriter fstream = new PrintWriter(new FileWriter("test"));
 
             for(String word : content.split("\n"))  {
                 fstream.println(word);
             }
-        } catch (IOException e) {
-            System.out.println("ERROR SAVING AS *FILE*!");
-            e.printStackTrace();
-        }
     }
 }

@@ -33,7 +33,7 @@ public class Main extends Application {
     @Override
     public void start(Stage window) {
         runtime();
-        window.setTitle("TextDoc Editor");
+        window.setTitle("TextFile Editor");
         StackPane win = new StackPane();
         win.getChildren().add(root);
         window.setScene(new Scene(win, width, height));
