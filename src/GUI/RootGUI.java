@@ -1,20 +1,17 @@
 package GUI;
 
-import Backend.FileOptions;
 import com.jfoenix.controls.JFXTabPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 public class RootGUI {
 
     private BorderPane root;
 
     //List of Nodes
-    JFXTabPane tabPane;
+    FileTabPane tabPane;
     TextArea textSpace;
     MenuGUI menu;
 
@@ -22,11 +19,9 @@ public class RootGUI {
     //Init
     public RootGUI(){
         root = new BorderPane();
-        tabPane = new JFXTabPane();
+        tabPane = new FileTabPane();
         textSpace = new TextArea();
         menu = new MenuGUI();
-        newTabCounter = 0;
-        textFiles = new ArrayList<TextFile>();
     }
 
     public BorderPane getRoot() {

@@ -1,23 +1,28 @@
 package GUI;
 
 import Backend.FileOptions;
+import javafx.beans.binding.Bindings;
 import javafx.scene.control.TabPane;
 
 import java.io.File;
 import java.util.ArrayList;
 
-public class FileTabs extends TabPane {
+public class FileTabPane extends TabPane {
+    int newTabCounter;
+
+    public FileTabPane(){
+        newTabCounter = 0;
+    }
 
     public void saveCurrent(){
-        int i = tabPane.getSelectionModel().getSelectedIndex();
-        System.out.println("Attempting save of " + i + ". ");
-        textFiles.get(i).save();
+        System.out.println("Attempting save of " + this.getSelectionModel().getSelectedIndex() + ". ");
+        getCurrent().save();
     }
 
     public void saveCurrentAs(){
-        int i = tabPane.getSelectionModel().getSelectedIndex();
+        int i = this.getSelectionModel().getSelectedIndex();
         System.out.println("Attempting save of " + i + ". ");
-        textFiles.get(i).saveAs();
+        getCurrent().saveAs();
     }
 
     public void newEmptyTab(){
@@ -27,10 +32,9 @@ public class FileTabs extends TabPane {
 
     private void createNewFileTab(){
         newTabCounter++;
-        TextFile newTextFile = new TextFile();
+        TextFileTab newTextFile = new TextFileTab();
         newTextFile.setTabName("Untitled " + newTabCounter);
-        tabPane.getTabs().add(newTextFile);
-        textFiles.add(newTextFile);
+        this.getTabs().add(newTextFile);
     }
 
     public void newTabFromPrexistingFile(){
@@ -49,15 +53,17 @@ public class FileTabs extends TabPane {
 
         FileOptions fileOptions = new FileOptions();
         newTabCounter++;
-        TextFile newTextFile = new TextFile(file);
+        TextFileTab newTextFile = new TextFileTab(file);
         newTextFile.setTabName(file.getName());
-        tabPane.getTabs().add(newTextFile);
-        textFiles.add(newTextFile);
+        this.getTabs().add(newTextFile);
     }
 
     public boolean isEmpty(){
-        return textFiles.isEmpty();
+        return this.getTabs().isEmpty();
     }
 
+    private TextFileTab getCurrent(){
+        return (TextFileTab) this.getSelectionModel().getSelectedItem();
+    }
 
 }

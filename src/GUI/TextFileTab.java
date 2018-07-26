@@ -3,22 +3,21 @@ package GUI;
 import Backend.FileOptions;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
-import javafx.scene.input.KeyCode;
 
 import java.io.File;
 import java.io.IOException;
 
-public class TextFile extends Tab {
+public class TextFileTab extends Tab {
     FileOptions fileOptions;
     private TextArea textSpace;
     private File lastVer; //last saved version of this text dcoument
     private boolean hasChangedSinceSave;
 
-    public TextFile(){
+    public TextFileTab(){
         this(null);
     }
 
-    public TextFile(File preexistingFile){
+    public TextFileTab(File preexistingFile){
         fileOptions = new FileOptions();
         lastVer = preexistingFile;
         String text = "";

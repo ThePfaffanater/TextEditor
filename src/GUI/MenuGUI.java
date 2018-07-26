@@ -8,15 +8,14 @@ import javafx.scene.control.MenuItem;
 public class MenuGUI{
 
     MenuBar menuBar;
-    TabHandler tabHandler;
+    TextFileTab tabPane;
 
     public MenuGUI(){
         menuBar = new MenuBar();
 
     }
 
-    public MenuBar getMenuBar(TabHandler tabHandler) {
-        this.tabHandler = tabHandler;
+    public MenuBar getMenuBar(FileTabPane tabPane) {
         menuBar.setUseSystemMenuBar(true);
         menuBar.getMenus().addAll(fileMenu(), viewMenu());
 
