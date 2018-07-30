@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class FileOptions {
+public class FileOperations {
 
     Stage stage = new Stage();
     File lastFile = null;

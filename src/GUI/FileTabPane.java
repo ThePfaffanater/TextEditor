@@ -1,67 +1,96 @@
 package GUI;
 
-import Backend.FileOptions;
-import javafx.beans.binding.Bindings;
+import Backend.FileOperations;
+import Backend.FileSaveException;
 import javafx.scene.control.TabPane;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class FileTabPane extends TabPane {
-    int newTabCounter;
 
     public FileTabPane(){
-        newTabCounter = 0;
+        //hello0oo
     }
 
+    /**
+     * saves the current tab's file
+     */
     public void saveCurrent(){
         System.out.println("Attempting save of " + this.getSelectionModel().getSelectedIndex() + ". ");
-        getCurrent().save();
+        try {
+            getCurrent().save();
+        } catch (FileSaveException e) {
+            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * saves the current tab as a new file
+     */
     public void saveCurrentAs(){
         int i = this.getSelectionModel().getSelectedIndex();
         System.out.println("Attempting save of " + i + ". ");
-        getCurrent().saveAs();
+        try {
+            getCurrent().saveAs();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
+    /**
+     * creates a new empty tab
+     */
     public void newEmptyTab(){
-        System.out.println("Making new empty text doc:");
-        createNewFileTab();
+       createNewFileTab();
     }
 
     private void createNewFileTab(){
-        newTabCounter++;
         TextFileTab newTextFile = new TextFileTab();
-        newTextFile.setTabName("Untitled " + newTabCounter);
         this.getTabs().add(newTextFile);
     }
 
-    public void newTabFromPrexistingFile(){
+    /**
+     * Creates a new tab by opening a previous file
+     */
+    public void newTabFromPreexistingFile(){
         try{
-            FileOptions fileOptions = new FileOptions();
-            ArrayList<File> files = fileOptions.openTextFiles();
+            FileOperations fileOperations = new FileOperations();
+            ArrayList<File> files = fileOperations.openTextFiles();
             for (File file : files){
                 createNewFileTab(file);
             }
         }catch (java.lang.NullPointerException e){
-            System.out.println("Error attempting to Open new file!");
+            System.out.println("Error attempting to Open new file! The file probably doesn't exist somehow?");
         }
     }
 
     private void createNewFileTab(File file){
-
-        FileOptions fileOptions = new FileOptions();
-        newTabCounter++;
         TextFileTab newTextFile = new TextFileTab(file);
-        newTextFile.setTabName(file.getName());
+        newTextFile.setTabTitle(file.getName());
         this.getTabs().add(newTextFile);
     }
 
+    public void addNewTab(String name, File file){
+        TextFileTab newTextFile = new TextFileTab(file);
+        this.getTabs().add(newTextFile);
+    }
+
+    /**
+     * @return if there is no tabs inside the tabPane
+     */
     public boolean isEmpty(){
         return this.getTabs().isEmpty();
     }
 
+    /**
+     * Dont worry there is definitely no hacky code in here...
+     * @return the current selected tab in the pane
+     */
     private TextFileTab getCurrent(){
         return (TextFileTab) this.getSelectionModel().getSelectedItem();
     }
