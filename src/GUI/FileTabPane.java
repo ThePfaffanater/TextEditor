@@ -10,8 +10,19 @@ import java.util.ArrayList;
 
 public class FileTabPane extends TabPane {
 
+    /**
+     * Contains multiple open text files in tabs
+     * with options to interact with the currently viewed file.
+     */
     public FileTabPane(){
         //hello0oo
+    }
+
+    /**
+     * @return if there is no tabs inside the tabPane
+     */
+    public boolean isEmpty(){
+        return this.getTabs().isEmpty();
     }
 
     /**
@@ -46,10 +57,6 @@ public class FileTabPane extends TabPane {
      * creates a new empty tab
      */
     public void newEmptyTab(){
-       createNewFileTab();
-    }
-
-    private void createNewFileTab(){
         TextFileTab newTextFile = new TextFileTab();
         this.getTabs().add(newTextFile);
     }
@@ -62,29 +69,13 @@ public class FileTabPane extends TabPane {
             FileOperations fileOperations = new FileOperations();
             ArrayList<File> files = fileOperations.openTextFiles();
             for (File file : files){
-                createNewFileTab(file);
+                TextFileTab newTextFile = new TextFileTab(file);
+                newTextFile.setTabTitle(file.getName());
+                this.getTabs().add(newTextFile);
             }
         }catch (java.lang.NullPointerException e){
             System.out.println("Error attempting to Open new file! The file probably doesn't exist somehow?");
         }
-    }
-
-    private void createNewFileTab(File file){
-        TextFileTab newTextFile = new TextFileTab(file);
-        newTextFile.setTabTitle(file.getName());
-        this.getTabs().add(newTextFile);
-    }
-
-    public void addNewTab(String name, File file){
-        TextFileTab newTextFile = new TextFileTab(file);
-        this.getTabs().add(newTextFile);
-    }
-
-    /**
-     * @return if there is no tabs inside the tabPane
-     */
-    public boolean isEmpty(){
-        return this.getTabs().isEmpty();
     }
 
     /**
