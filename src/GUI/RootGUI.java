@@ -27,10 +27,6 @@ public class RootGUI {
         return root;
     }
 
-    public void Update(){
-
-    }
-
 
 }
 

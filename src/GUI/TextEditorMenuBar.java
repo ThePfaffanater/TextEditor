@@ -1,5 +1,6 @@
 package GUI;
 
+import Backend.ChangeDetect;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -7,6 +8,7 @@ import javafx.scene.control.MenuItem;
 public class TextEditorMenuBar extends MenuBar {
 
     FileTabPane tabPane;
+    ChangeDetect changeDetect;
 
     /**
      * Is a file bar that provides options
@@ -21,6 +23,7 @@ public class TextEditorMenuBar extends MenuBar {
     private Menu fileMenu(){ //TextEditorMenuBar
         Menu fileMenu = new Menu("File");
         MenuItem saveFile = new MenuItem("Save");
+        changeDetect = new ChangeDetect(tabPane);
         saveFile.setOnAction(event -> {
             tabPane.saveCurrent();
         });
@@ -34,6 +37,7 @@ public class TextEditorMenuBar extends MenuBar {
         newFile.setOnAction(e -> {
             tabPane.newEmptyTab();
             saveAsFile.setDisable(false);
+            saveFile.setDisable(false);
 
         });
 
@@ -42,23 +46,30 @@ public class TextEditorMenuBar extends MenuBar {
             System.out.println("Attempting to open file");
             tabPane.newTabFromPreexistingFile();
         });
+
         //Disables
         if (tabPane.isEmpty()){
             saveFile.setDisable(true);
             saveAsFile.setDisable(true);
         }
         else {
+
+            if(changeDetect.isChanged()){
+
+            }
+
+
             saveFile.setDisable(false);
             saveAsFile.setDisable(false);
-        }
+    }
+
         fileMenu.getItems().addAll(newFile,openFile,saveFile,saveAsFile);
         return fileMenu;
     }
 
     private Menu viewMenu(){ //ViewMenu
-
         Menu viewMenu = new Menu("View");
-        viewMenu.getItems().add(new MenuItem("Search"));
+        viewMenu.getItems().add(new MenuItem("Search"));//search is currently non-functional
 
         return  viewMenu;
     }

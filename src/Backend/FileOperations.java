@@ -37,7 +37,7 @@ public class FileOperations {
     /**
      * Will do the same as saveTextFile but will queuery the user
      * @param content the content file you are wishing ot save
-     * @return a File object of the TextFileTab saved.
+     * @return a File object of the FileTab saved.
      */
     public File saveTextFileAs(String content) throws IOException {
         final FileChooser fileChooser = new FileChooser();

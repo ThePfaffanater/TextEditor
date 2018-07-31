@@ -8,7 +8,7 @@ import javafx.scene.control.TextArea;
 import java.io.File;
 import java.io.IOException;
 
-public class TextFileTab extends Tab {
+public class FileTab extends Tab {
     FileOperations fileOperations;
     private TextArea textSpace;
     private File lastVer; //last saved version of this text document
@@ -18,7 +18,7 @@ public class TextFileTab extends Tab {
     /**
      * Creates a new tab with no text and a title of "New Untitled"
      */
-    public TextFileTab(){
+    FileTab(){
         this(null, null);
     }
 
@@ -26,7 +26,7 @@ public class TextFileTab extends Tab {
      *  creates a new tab with no text and a specified title
      * @param title of the new tab
      */
-    public TextFileTab(String title){
+    FileTab(String title){
         this(title, null);
     }
 
@@ -35,7 +35,7 @@ public class TextFileTab extends Tab {
      *  and a title of the file's name.
      * @param preexistingFile the file the new tab will open to
      */
-    public TextFileTab(File preexistingFile){
+    FileTab(File preexistingFile){
         this(preexistingFile.getName(), preexistingFile);
     }
 
@@ -45,7 +45,7 @@ public class TextFileTab extends Tab {
      * @param title of the tab
      * @param preexistingFile the file the new tab will open to
      */
-    private TextFileTab(String title, File preexistingFile){
+    private FileTab(String title, File preexistingFile){
 
         fileOperations = new FileOperations();
         lastVer        = preexistingFile;
@@ -63,6 +63,7 @@ public class TextFileTab extends Tab {
         this.setContent(textSpace);
         textSpace.setWrapText(false);
         textSpace.setText(text);
+
     }
 
 
@@ -115,7 +116,7 @@ public class TextFileTab extends Tab {
 
     /**
      * @return true if current text is different from the saved version
-     * does perform a costly read of the previous text doc.
+     * Does perform a costly read of the previous text fileS.
      */
     public boolean checkChangedFromFile(){
         if(lastVer==null) {

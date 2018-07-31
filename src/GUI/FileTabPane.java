@@ -57,7 +57,7 @@ public class FileTabPane extends TabPane {
      * creates a new empty tab
      */
     public void newEmptyTab(){
-        TextFileTab newTextFile = new TextFileTab();
+        FileTab newTextFile = new FileTab();
         this.getTabs().add(newTextFile);
     }
 
@@ -69,7 +69,7 @@ public class FileTabPane extends TabPane {
             FileOperations fileOperations = new FileOperations();
             ArrayList<File> files = fileOperations.openTextFiles();
             for (File file : files){
-                TextFileTab newTextFile = new TextFileTab(file);
+                FileTab newTextFile = new FileTab(file);
                 newTextFile.setTabTitle(file.getName());
                 this.getTabs().add(newTextFile);
             }
@@ -82,8 +82,8 @@ public class FileTabPane extends TabPane {
      * Dont worry there is definitely no hacky code in here...
      * @return the current selected tab in the pane
      */
-    private TextFileTab getCurrent(){
-        return (TextFileTab) this.getSelectionModel().getSelectedItem();
+    public FileTab getCurrent(){
+        return (FileTab) this.getSelectionModel().getSelectedItem();
     }
 
 }

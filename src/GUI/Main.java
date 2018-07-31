@@ -33,7 +33,7 @@ public class Main extends Application {
     @Override
     public void start(Stage window) {
         runtime();
-        window.setTitle("TextFileTab Editor");
+        window.setTitle("FileTab Editor");
         StackPane win = new StackPane();
         win.getChildren().add(root);
         window.setScene(new Scene(win, width, height));
