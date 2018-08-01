@@ -6,7 +6,6 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class FileOperations {
 
@@ -23,16 +22,21 @@ public class FileOperations {
         return arrayList;
     }
 
-    public String getStringFromTextFile(File file){
-        String words;
-        try {
-            return  words = new Scanner(file).useDelimiter("\\A").next();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            System.out.println("Error Reading File!!");
+    public String readFile(File file) throws FileNotFoundException {
+        String output = "";
+
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                output+= (line + "\n");
+            }
+        } catch (IOException e1) {
+            e1.printStackTrace();
         }
-        return "";
+
+        return output;
     }
+
 
     /**
      * Will do the same as saveTextFile but will queuery the user
@@ -47,18 +51,17 @@ public class FileOperations {
         fileChooser.getExtensionFilters().add(extFilter);
         selectedDirectory = fileChooser.showSaveDialog(stage);
 
-        System.out.println(selectedDirectory.getAbsolutePath());
-        //saveTextFile(selectedDirectory.getAbsolutePath(), content);
-
+        saveTextFile(selectedDirectory, content);
         return selectedDirectory;
-
     }
 
-    public void saveTextFile(String filepath, String content) throws IOException {
-            PrintWriter fstream = new PrintWriter(new FileWriter("test"));
+    public void saveTextFile(File saveTo, String content) throws IOException {
+        System.out.println("Saved file to:" + saveTo.getAbsolutePath());
 
-            for(String word : content.split("\n"))  {
-                fstream.println(word);
-            }
+        PrintWriter fstream = new PrintWriter(saveTo);
+        for(String line : content.split("[\\r\\n]+"))  {
+            fstream.write(line + "\r\n");
+        }
+        fstream.close();
     }
 }

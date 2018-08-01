@@ -1,5 +1,7 @@
 package GUI;
 
+import Backend.Config.DefaultConfig;
+import Backend.Config.ITextEditorConfig;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -8,18 +10,22 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 
-
 public class Main extends Application {
 
     BorderPane root;
     RootGUI mainGui;
 
-    int width  = 650;
-    int height = 450;
+    public ITextEditorConfig config;
+
+
+    public Main() {
+        config = new DefaultConfig();
+    }
 
 
     public static void main(String[] args) {
-        launch(args);
+        Main main = new Main();
+        main.launch(args);
     }
 
 
@@ -32,17 +38,18 @@ public class Main extends Application {
 
     @Override
     public void start(Stage window) {
-        runtime();
+        root = mainGui.getRoot();
         window.setTitle("FileTab Editor");
         StackPane win = new StackPane();
         win.getChildren().add(root);
-        window.setScene(new Scene(win, width, height));
+        window.setScene(new Scene(win, config.getInitialWidth(), config.getInitialHeight()));
         window.show();
-        window.setOnCloseRequest(e -> Platform.exit()); //Exit Commands
-    }
 
 
-    void runtime(){
-        root = mainGui.getRoot();
+        window.setOnCloseRequest(e -> {
+            System.out.println(config.ANSI_BLUE + "Process finishing...");
+            Platform.exit();
+            System.exit(0);
+        });
     }
 }

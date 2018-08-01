@@ -1,11 +1,11 @@
 package GUI;
 
 import Backend.FileOperations;
-import Backend.FileSaveException;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class FileTab extends Tab {
@@ -55,15 +55,22 @@ public class FileTab extends Tab {
             title = ("Untitled " + ++newTabCount);
         }
         if(lastVer != null) {
-            text  = fileOperations.getStringFromTextFile(lastVer);//gets all the text from the preexisting file
+            try {
+                text  = fileOperations.readFile(lastVer);//gets all the text from the preexisting file
+            } catch (FileNotFoundException e) {
+                System.out.println(e.getMessage());
+            }
         }
 
-        this.setText(title);//Sets the title of the tab
-        textSpace = new TextArea();
-        this.setContent(textSpace);
-        textSpace.setWrapText(false);
-        textSpace.setText(text);
+        this.setText(title);         //set tab title
+        textSpace = new TextArea();  //new text area
+        this.setContent(textSpace);  //places textArea inside of this tab
+        textSpace.setWrapText(false);//disables textWrap TODO: make a global settings var control this
+        textSpace.setText(text);     //places text inside of the textArea from opening.
 
+
+        this.setOnCloseRequest(e -> {
+        });
     }
 
 
@@ -84,15 +91,18 @@ public class FileTab extends Tab {
     /**
      * saves the current text file using it's location/name
      */
-    public void save() throws FileSaveException, IOException {
+    public void save() throws FileNotFoundException, IOException {
         if(lastVer == null) {
-            throw new FileSaveException("There is no previous file to base this save off of!");
+            throw new FileNotFoundException("There is no previous file to base this save off of!");
         }
 
         try {
-            fileOperations.saveTextFile(lastVer.getAbsolutePath(), this.getFileText());
+            fileOperations.saveTextFile(lastVer, this.getFileText());
         }catch(IOException e){
-            throw new IOException("ERROR attempting IO operation of save");
+            throw new IOException("ERROR: Attempting IO Operation of SAVE");
+        }catch (NullPointerException e){
+            System.out.println("\u001B[31m" + "ERROR: SOMETHING THAT YOU ARE TRYING TO ACCESS DOES NOT EXIST!");
+            e.printStackTrace();
         }
     }
 
@@ -100,7 +110,7 @@ public class FileTab extends Tab {
      * saves the current text file using a user chosen
      *  location/name
      */
-    public void saveAs() throws IOException {
+    public void saveAs() throws IOException, NullPointerException {
 
         FileOperations fileOperations = new FileOperations();
 
@@ -109,9 +119,14 @@ public class FileTab extends Tab {
             String fileName = fileOperations.saveTextFileAs(this.getFileText()).getName();
             this.setTabTitle(fileName);
         } catch (IOException e) {
-            throw new IOException("ERROR Attempting IO Operation of SAVE_AS");
+            throw new IOException("ERROR: Attempting IO Operation of SAVE_AS");
+        } catch (NullPointerException e){
+            System.out.println("ERROR: SOMETHING THAT YOU ARE TRYING TO ACCESS DOES NOT EXIST!");
+            e.printStackTrace();
         }
+
         hasChangedSinceSave = false;
+
     }
 
     /**
@@ -120,15 +135,22 @@ public class FileTab extends Tab {
      */
     public boolean checkChangedFromFile(){
         if(lastVer==null) {
-            return false;//if the file has never been saved
-        }                // return false.
+            this.hasChangedSinceSave = true;
+            return this.hasChangedSinceSave;//if the file has never been saved
+        }                                   // return false.
 
-
-        if(!fileOperations.getStringFromTextFile(lastVer).equals(this.getFileText())){ //if the two are not the same, the file has changed
-            return true;
-        }else{
-            return false;
+        try {
+            if(!fileOperations.readFile(lastVer).equals(this.getFileText())){
+                System.out.println("Comparing both vers");
+                this.hasChangedSinceSave = true;
+                return this.hasChangedSinceSave;//if the two are not the same, the file has changed
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
         }
+
+        this.hasChangedSinceSave = false;
+        return this.hasChangedSinceSave;
     }
 
     public boolean isChanged(){

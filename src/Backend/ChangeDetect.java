@@ -12,7 +12,8 @@ public class ChangeDetect extends Thread{
     private boolean continueRun;
 
     /**
-     *
+     *Wraps a {@link GUI.FileTab} to continously check for
+     * changes between the current version and the last saved.
      * @param fileTabPane
      */
     public ChangeDetect(FileTabPane fileTabPane){
@@ -26,29 +27,31 @@ public class ChangeDetect extends Thread{
         return this.isChanged;
     }
 
-    public boolean close(){
-
+    public void close(){
+        continueRun = false;
     }
 
     public void run() {
         try {
             long startTime   = System.currentTimeMillis();
-            final long MIN_LOOP_TIME = 150;
-
-
+            final long MIN_LOOP_TIME = 200;
             while(continueRun) {
                 if (fileTabPane.isEmpty()) {
-                    thread.sleep(200);//so we dont spam if nothing exists
+                    thread.sleep(400);//so we dont spam if nothing exists
                     continue;
                 }
 
                 if (fileTabPane.isFocused()) {
                     fileTabPane.setOnKeyTyped(event -> {
                         this.isChanged = fileTabPane.getCurrent().checkChangedFromFile();
+                        try {
+                            thread.sleep(50);
+                        } catch (InterruptedException e) {
+                        }
                     });
                 }
 
-                thread.sleep(Math.max(0, System.currentTimeMillis()-MIN_LOOP_TIME));//so we dont negative sleep
+                thread.sleep(Math.max(0, System.currentTimeMillis()- MIN_LOOP_TIME));//so we don't negative sleep
             }
         }catch (InterruptedException e) {
 
@@ -57,7 +60,7 @@ public class ChangeDetect extends Thread{
     }
 
     public void start () {
-        System.out.println("Starting " +  THREAD_NAME );
+        System.out.println("Starting new thread: " +  THREAD_NAME );
         if (thread == null) {
             thread = new Thread (this, THREAD_NAME);
             thread.start ();

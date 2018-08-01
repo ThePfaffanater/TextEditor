@@ -1,10 +1,10 @@
 package GUI;
 
 import Backend.FileOperations;
-import Backend.FileSaveException;
 import javafx.scene.control.TabPane;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -29,11 +29,11 @@ public class FileTabPane extends TabPane {
      * saves the current tab's file
      */
     public void saveCurrent(){
-        System.out.println("Attempting save of " + this.getSelectionModel().getSelectedIndex() + ". ");
-        try {
+       try {
             getCurrent().save();
-        } catch (FileSaveException e) {
-            System.out.println(e.getMessage());
+        } catch (FileNotFoundException e) {
+            System.out.println("Performing a SaveAs instead:");
+            saveCurrentAs();
         } catch (IOException e) {
             System.out.println(e.getMessage());
             e.printStackTrace();
@@ -45,12 +45,14 @@ public class FileTabPane extends TabPane {
      */
     public void saveCurrentAs(){
         int i = this.getSelectionModel().getSelectedIndex();
-        System.out.println("Attempting save of " + i + ". ");
         try {
             getCurrent().saveAs();
         } catch (IOException e) {
             System.out.println(e.getMessage());
+        }catch (NullPointerException e) {
+            System.out.println(e.getMessage());
         }
+
     }
 
     /**
@@ -67,10 +69,9 @@ public class FileTabPane extends TabPane {
     public void newTabFromPreexistingFile(){
         try{
             FileOperations fileOperations = new FileOperations();
-            ArrayList<File> files = fileOperations.openTextFiles();
+            ArrayList<File> files = fileOperations.openTextFiles(); //list of files chosen to open
             for (File file : files){
                 FileTab newTextFile = new FileTab(file);
-                newTextFile.setTabTitle(file.getName());
                 this.getTabs().add(newTextFile);
             }
         }catch (java.lang.NullPointerException e){
