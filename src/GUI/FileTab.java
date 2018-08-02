@@ -1,5 +1,6 @@
 package GUI;
 
+import Backend.Config.ITextEditorConfig;
 import Backend.FileOperations;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TextArea;
@@ -9,34 +10,39 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class FileTab extends Tab {
-    FileOperations fileOperations;
-    private TextArea textSpace;
+    private final ITextEditorConfig CONFIG;
+    private final FileOperations fileOperations;
+    private final TextArea textSpace;
     private File lastVer; //last saved version of this text document
     private boolean hasChangedSinceSave;
+    private boolean hasKeyBeenPressed;
     private static int newTabCount = 0;//keeps count of how many new tabs have been opened
 
     /**
      * Creates a new tab with no text and a title of "New Untitled"
+     * @param CONFIG the Configuration of the TextEditor
      */
-    FileTab(){
-        this(null, null);
+    FileTab(final ITextEditorConfig CONFIG){
+        this(null, null, CONFIG);
     }
 
     /**
      *  creates a new tab with no text and a specified title
      * @param title of the new tab
+     * @param CONFIG the Configuration of the TextEditor
      */
-    FileTab(String title){
-        this(title, null);
+    FileTab(String title, final ITextEditorConfig CONFIG){
+        this(title, null, CONFIG);
     }
 
     /**
      * Creates a new tab with the content from a file specified
      *  and a title of the file's name.
      * @param preexistingFile the file the new tab will open to
+     * @param CONFIG the Configuration of the TextEditor
      */
-    FileTab(File preexistingFile){
-        this(preexistingFile.getName(), preexistingFile);
+    FileTab(File preexistingFile, final ITextEditorConfig CONFIG){
+        this(preexistingFile.getName(), preexistingFile, CONFIG);
     }
 
     /**
@@ -44,9 +50,10 @@ public class FileTab extends Tab {
      * If file is null the textArea will be empty
      * @param title of the tab
      * @param preexistingFile the file the new tab will open to
+     * @param CONFIG the Configuration of the TextEditor
      */
-    private FileTab(String title, File preexistingFile){
-
+    private FileTab(String title, File preexistingFile, final ITextEditorConfig CONFIG){
+        this.CONFIG = CONFIG;
         fileOperations = new FileOperations();
         lastVer        = preexistingFile;
         String text    = "";
@@ -55,21 +62,24 @@ public class FileTab extends Tab {
             title = ("Untitled " + ++newTabCount);
         }
         if(lastVer != null) {
-            try {
-                text  = fileOperations.readFile(lastVer);//gets all the text from the preexisting file
-            } catch (FileNotFoundException e) {
-                System.out.println(e.getMessage());
-            }
+            text  = fileOperations.readFile(lastVer);//gets all the text from the preexisting file
+            hasChangedSinceSave = false;
+        }else{
+            hasChangedSinceSave = true;
         }
 
         this.setText(title);         //set tab title
         textSpace = new TextArea();  //new text area
         this.setContent(textSpace);  //places textArea inside of this tab
-        textSpace.setWrapText(false);//disables textWrap TODO: make a global settings var control this
+        textSpace.setWrapText(CONFIG.isTextWrapEnabled());//decides textWrap
         textSpace.setText(text);     //places text inside of the textArea from opening.
 
+        this.hasKeyBeenPressed = false;
+
+        textSpace.setOnKeyReleased((e -> this.hasKeyBeenPressed = true));
 
         this.setOnCloseRequest(e -> {
+            //TODO: dont let close if unsaved without confirmation
         });
     }
 
@@ -77,7 +87,7 @@ public class FileTab extends Tab {
     /**
      * @param newName what the tab title will be changed to
      */
-    public void setTabTitle(String newName){
+    private void setTabTitle(String newName){
         this.setText(newName);
     }
 
@@ -91,18 +101,18 @@ public class FileTab extends Tab {
     /**
      * saves the current text file using it's location/name
      */
-    public void save() throws FileNotFoundException, IOException {
+    void save() throws IOException {
         if(lastVer == null) {
             throw new FileNotFoundException("There is no previous file to base this save off of!");
         }
 
         try {
             fileOperations.saveTextFile(lastVer, this.getFileText());
+            hasChangedSinceSave = false;
         }catch(IOException e){
-            throw new IOException("ERROR: Attempting IO Operation of SAVE");
+            throw new IOException(CONFIG.ANSI_BLUE  + "ERROR: Attempting IO Operation of SAVE");
         }catch (NullPointerException e){
-            System.out.println("\u001B[31m" + "ERROR: SOMETHING THAT YOU ARE TRYING TO ACCESS DOES NOT EXIST!");
-            e.printStackTrace();
+            System.out.println(CONFIG.ANSI_BLUE + "ERROR: SOMETHING THAT YOU ARE TRYING TO ACCESS DOES NOT EXIST!");
         }
     }
 
@@ -116,17 +126,15 @@ public class FileTab extends Tab {
 
         try {
 
-            String fileName = fileOperations.saveTextFileAs(this.getFileText()).getName();
-            this.setTabTitle(fileName);
+            lastVer = fileOperations.saveTextFileAs(this.getFileText());
+            this.setTabTitle(lastVer.getName());
+            hasChangedSinceSave = false;
         } catch (IOException e) {
             throw new IOException("ERROR: Attempting IO Operation of SAVE_AS");
         } catch (NullPointerException e){
             System.out.println("ERROR: SOMETHING THAT YOU ARE TRYING TO ACCESS DOES NOT EXIST!");
             e.printStackTrace();
         }
-
-        hasChangedSinceSave = false;
-
     }
 
     /**
@@ -138,21 +146,39 @@ public class FileTab extends Tab {
             this.hasChangedSinceSave = true;
             return this.hasChangedSinceSave;//if the file has never been saved
         }                                   // return false.
-
-        try {
-            if(!fileOperations.readFile(lastVer).equals(this.getFileText())){
-                System.out.println("Comparing both vers");
-                this.hasChangedSinceSave = true;
-                return this.hasChangedSinceSave;//if the two are not the same, the file has changed
-            }
-        } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
+        else if(!fileOperations.readFile(lastVer).equals(this.getFileText())){
+            this.hasChangedSinceSave = true;
+            return this.hasChangedSinceSave;//if the two are not the same, the file has changed
         }
 
         this.hasChangedSinceSave = false;
         return this.hasChangedSinceSave;
     }
 
+    /**
+     * @returns true if a key has been pressed in the pane since last time this was called.
+     */
+    public boolean hasKeyBeenPressed(){
+        if(hasKeyBeenPressed) {
+           hasKeyBeenPressed = false;
+           return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return true if the Tab is currently in focus
+     */
+    public boolean isFocused(){
+        return textSpace.isFocused();
+    }
+
+    /**
+     * @return true if the file has been changed
+     * But not updated by manually checking the two files
+     * (faster, lighter way of doing it after another thread already manually checked).
+     */
     public boolean isChanged(){
         return this.hasChangedSinceSave;
     }

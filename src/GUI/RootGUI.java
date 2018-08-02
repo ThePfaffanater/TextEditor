@@ -1,27 +1,27 @@
 package GUI;
 
+import Backend.Config.ITextEditorConfig;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 
-public class RootGUI {
+class RootGUI {
 
-    private BorderPane root;
+    private final BorderPane root;
 
     //List of Nodes
-    FileTabPane tabPane;
-    TextArea textSpace;
-    TextEditorMenuBar menuBar;
+    private final FileTabPane tabPane;
+    private final TextEditorMenuBar menuBar;
 
 
     //Init
-    public RootGUI(){
+    RootGUI(final ITextEditorConfig CONFIG){
         root = new BorderPane();
-        tabPane = new FileTabPane();
-        textSpace = new TextArea();
+        tabPane = new FileTabPane(CONFIG);
+        TextArea textSpace = new TextArea();
         menuBar = new TextEditorMenuBar(tabPane);
     }
 
-    public BorderPane getRoot() {
+    BorderPane getRoot() {
         root.setCenter(tabPane);
         root.setTop(menuBar);
         return root;

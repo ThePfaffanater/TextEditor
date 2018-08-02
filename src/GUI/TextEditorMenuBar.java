@@ -1,21 +1,24 @@
 package GUI;
 
 import Backend.ChangeDetect;
+import javafx.event.ActionEvent;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 
-public class TextEditorMenuBar extends MenuBar {
+import static java.lang.System.out;
 
-    FileTabPane tabPane;
-    ChangeDetect changeDetect;
+class TextEditorMenuBar extends MenuBar {
+
+    private final FileTabPane tabPane;
+    private final ChangeDetect changeDetect;
 
     /**
      * Is a file bar that provides options
      *  based of the context of the
      * @param tabPane is required to provide context and to allow the MenuBar to interact with the current file
      */
-    public TextEditorMenuBar(FileTabPane tabPane){
+    TextEditorMenuBar(FileTabPane tabPane){
         this.tabPane = tabPane;
         this.getMenus().addAll(fileMenu(), viewMenu());
 
@@ -26,14 +29,10 @@ public class TextEditorMenuBar extends MenuBar {
     private Menu fileMenu(){ //TextEditorMenuBar
         Menu fileMenu = new Menu("File");
         MenuItem saveFile = new MenuItem("Save"); //Save current file
-        saveFile.setOnAction(event -> {
-            tabPane.saveCurrent();
-        });
+        saveFile.setOnAction(event -> tabPane.saveCurrent());
 
         MenuItem saveAsFile = new MenuItem("Save As..."); //Save current file as a new one
-        saveAsFile.setOnAction(event -> {
-            tabPane.saveCurrentAs();
-        }); //Save current file
+        saveAsFile.setOnAction(event -> tabPane.saveCurrentAs()); //Save current file
 
         MenuItem newFile = new MenuItem("New");  //Create new file
         newFile.setOnAction(e -> {
@@ -44,32 +43,31 @@ public class TextEditorMenuBar extends MenuBar {
         });
 
         MenuItem openFile = new MenuItem("Open");//Open old file
-        openFile.setOnAction(e -> {
-            System.out.println("Attempting to open file");
-            tabPane.newTabFromPreexistingFile();
-        });
+        openFile.setOnAction(this::handle);
 
-        (new Thread() {
-            public void run() {
-                while (true) {
-                    //Disables
-                    if (tabPane.isEmpty()) {
-                        saveFile.setDisable(true);
-                        saveAsFile.setDisable(true);
-                    } else {
-                        saveAsFile.setDisable(false);
+        //Disables
+        //if the current version differs from it's last save allow save
+        //If the current version does not differ from it's last save only allow saveAs
+        new Thread(() -> {
+            //noinspection InfiniteLoopStatement
+            while (true) {
+                //Disables
+                if (tabPane.isEmpty()) {
+                    saveFile.setDisable(true);
+                    saveAsFile.setDisable(true);
+                } else {
+                    saveAsFile.setDisable(false);
 
-                        if (changeDetect.isChanged()) {//if the current version differs from it's last save allow save
-                            saveFile.setDisable(false);
-                        }else{
-                            saveFile.setDisable(true); //If the current version does not differ from it's last save only allow saveAs
-                        }
+                    if (changeDetect.isChanged()) {//if the current version differs from it's last save allow save
+                        saveFile.setDisable(false);
+                    }else{
+                        saveFile.setDisable(true); //If the current version does not differ from it's last save only allow saveAs
                     }
-                    try {
-                        this.sleep(250);
-                    } catch (InterruptedException e) {
-                        System.out.println("Sleep interrupt!!!");
-                    }
+                }
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException e) {
+                    out.println("Sleep interrupt!!!");
                 }
             }
         }).start();
@@ -85,4 +83,8 @@ public class TextEditorMenuBar extends MenuBar {
         return  viewMenu;
     }
 
+    private void handle(ActionEvent e) {
+        out.println("Attempting to open file");
+        tabPane.newTabFromPreexistingFile();
+    }
 }

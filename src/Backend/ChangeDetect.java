@@ -4,17 +4,17 @@ import GUI.FileTabPane;
 
 public class ChangeDetect extends Thread{
 
-    public final String THREAD_NAME;
+    private final String THREAD_NAME;
     private Thread thread;
     private static int totalThreadCount = 0;
-    private FileTabPane fileTabPane;
+    private final FileTabPane fileTabPane;
     private boolean isChanged;
     private boolean continueRun;
 
     /**
      *Wraps a {@link GUI.FileTab} to continously check for
      * changes between the current version and the last saved.
-     * @param fileTabPane
+     * @param fileTabPane the TabPane needed to access the currently focused tabs within own thread
      */
     public ChangeDetect(FileTabPane fileTabPane){
         this.fileTabPane = fileTabPane;
@@ -27,40 +27,42 @@ public class ChangeDetect extends Thread{
         return this.isChanged;
     }
 
+    /**
+     * will close the thread of change detect for a safe deletion.
+     */
     public void close(){
         continueRun = false;
     }
 
     public void run() {
         try {
-            long startTime   = System.currentTimeMillis();
-            final long MIN_LOOP_TIME = 200;
+            System.out.println("Starting new thread: " +  THREAD_NAME );
+            final long MIN_LOOP_TIME = 350;
             while(continueRun) {
+                long START_TIME   = System.currentTimeMillis();
                 if (fileTabPane.isEmpty()) {
-                    thread.sleep(400);//so we dont spam if nothing exists
+                    sleep(750);//so we dont spam if nothing exists
                     continue;
-                }
+                }else {
+                        if (fileTabPane.getCurrent().isFocused() && fileTabPane.getCurrent().hasKeyBeenPressed()) {
+                            this.isChanged = fileTabPane.getCurrent().checkChangedFromFile();
+                            try {
+                                sleep(50);
+                            } catch (InterruptedException e) {
+                                System.out.println(e.getMessage());
+                            }
 
-                if (fileTabPane.isFocused()) {
-                    fileTabPane.setOnKeyTyped(event -> {
-                        this.isChanged = fileTabPane.getCurrent().checkChangedFromFile();
-                        try {
-                            thread.sleep(50);
-                        } catch (InterruptedException e) {
-                        }
-                    });
+                        }else this.isChanged = fileTabPane.getCurrent().isChanged();
                 }
-
-                thread.sleep(Math.max(0, System.currentTimeMillis()- MIN_LOOP_TIME));//so we don't negative sleep
+                sleep(Math.max(0, MIN_LOOP_TIME-(System.currentTimeMillis()-START_TIME)));//so we don't negative sleep
             }
         }catch (InterruptedException e) {
-
+            System.out.println(e.getMessage());
         }
 
     }
 
     public void start () {
-        System.out.println("Starting new thread: " +  THREAD_NAME );
         if (thread == null) {
             thread = new Thread (this, THREAD_NAME);
             thread.start ();

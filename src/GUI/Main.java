@@ -12,27 +12,26 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    BorderPane root;
-    RootGUI mainGui;
+    private final ITextEditorConfig CONFIG;
+    private BorderPane root;
+    private RootGUI mainGui;
 
-    public ITextEditorConfig config;
 
-
-    public Main() {
-        config = new DefaultConfig();
+    private Main() {
+        CONFIG = new DefaultConfig();
     }
 
 
     public static void main(String[] args) {
         Main main = new Main();
-        main.launch(args);
+        launch(args);
     }
 
 
     @Override
-    public void init() throws Exception {
+    public void init() {
         root = new BorderPane();
-        mainGui = new RootGUI();
+        mainGui = new RootGUI(CONFIG);
     }
 
 
@@ -42,12 +41,12 @@ public class Main extends Application {
         window.setTitle("FileTab Editor");
         StackPane win = new StackPane();
         win.getChildren().add(root);
-        window.setScene(new Scene(win, config.getInitialWidth(), config.getInitialHeight()));
+        window.setScene(new Scene(win, CONFIG.getInitialWidth(), CONFIG.getInitialHeight()));
         window.show();
 
 
         window.setOnCloseRequest(e -> {
-            System.out.println(config.ANSI_BLUE + "Process finishing...");
+            System.out.println(CONFIG.ANSI_BLUE + "Process finishing...");
             Platform.exit();
             System.exit(0);
         });

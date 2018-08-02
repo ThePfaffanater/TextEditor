@@ -1,5 +1,6 @@
 package GUI;
 
+import Backend.Config.ITextEditorConfig;
 import Backend.FileOperations;
 import javafx.scene.control.TabPane;
 
@@ -10,12 +11,14 @@ import java.util.ArrayList;
 
 public class FileTabPane extends TabPane {
 
+    private final ITextEditorConfig CONFIG;
+
     /**
      * Contains multiple open text files in tabs
      * with options to interact with the currently viewed file.
      */
-    public FileTabPane(){
-        //hello0oo
+    FileTabPane(final ITextEditorConfig CONFIG){
+        this.CONFIG = CONFIG;
     }
 
     /**
@@ -36,20 +39,17 @@ public class FileTabPane extends TabPane {
             saveCurrentAs();
         } catch (IOException e) {
             System.out.println(e.getMessage());
-            e.printStackTrace();
         }
     }
 
     /**
      * saves the current tab as a new file
      */
-    public void saveCurrentAs(){
+    void saveCurrentAs(){
         int i = this.getSelectionModel().getSelectedIndex();
         try {
             getCurrent().saveAs();
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }catch (NullPointerException e) {
+        } catch (IOException | NullPointerException e) {
             System.out.println(e.getMessage());
         }
 
@@ -58,20 +58,20 @@ public class FileTabPane extends TabPane {
     /**
      * creates a new empty tab
      */
-    public void newEmptyTab(){
-        FileTab newTextFile = new FileTab();
+    void newEmptyTab(){
+        FileTab newTextFile = new FileTab(CONFIG);
         this.getTabs().add(newTextFile);
     }
 
     /**
      * Creates a new tab by opening a previous file
      */
-    public void newTabFromPreexistingFile(){
+    void newTabFromPreexistingFile(){
         try{
             FileOperations fileOperations = new FileOperations();
             ArrayList<File> files = fileOperations.openTextFiles(); //list of files chosen to open
             for (File file : files){
-                FileTab newTextFile = new FileTab(file);
+                FileTab newTextFile = new FileTab(file,CONFIG);
                 this.getTabs().add(newTextFile);
             }
         }catch (java.lang.NullPointerException e){

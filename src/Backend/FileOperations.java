@@ -7,34 +7,35 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javafx.stage.FileChooser.ExtensionFilter;
+
 public class FileOperations {
 
-    Stage stage = new Stage();
+    private final Stage stage = new Stage();
     File lastFile = null;
 
     public ArrayList<File> openTextFiles(){
         final FileChooser fileChooser = new FileChooser();
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Text Files (*.txt)", new String[]{"*.txt"});
+        ExtensionFilter extFilter = new ExtensionFilter("Text Files (*.txt)", "*.txt", "*.html");
         fileChooser.getExtensionFilters().add(extFilter);
         fileChooser.setTitle("Open .VB File(s)");
         List<File> list = fileChooser.showOpenMultipleDialog(stage);
-        ArrayList<File> arrayList = new ArrayList<>(list);
-        return arrayList;
+        return new ArrayList<>(list);
     }
 
-    public String readFile(File file) throws FileNotFoundException {
-        String output = "";
+    public String readFile(File file) {
+        StringBuilder output = new StringBuilder();
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = br.readLine()) != null) {
-                output+= (line + "\n");
+                output.append(line).append("\n");
             }
         } catch (IOException e1) {
             e1.printStackTrace();
         }
 
-        return output;
+        return output.toString();
     }
 
 
@@ -47,7 +48,7 @@ public class FileOperations {
         final FileChooser fileChooser = new FileChooser();
         File selectedDirectory;
         fileChooser.setTitle("Save As");
-        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Text Files (*.txt)", new String[]{"*.txt"});
+        ExtensionFilter extFilter = new ExtensionFilter("Text Files (*.txt)", new String[]{"*.txt", "*.html"});
         fileChooser.getExtensionFilters().add(extFilter);
         selectedDirectory = fileChooser.showSaveDialog(stage);
 
@@ -56,12 +57,14 @@ public class FileOperations {
     }
 
     public void saveTextFile(File saveTo, String content) throws IOException {
-        System.out.println("Saved file to:" + saveTo.getAbsolutePath());
-
+        if(saveTo==null){
+            throw new FileNotFoundException("There is no file location to save to!!!");
+        }
         PrintWriter fstream = new PrintWriter(saveTo);
         for(String line : content.split("[\\r\\n]+"))  {
             fstream.write(line + "\r\n");
         }
         fstream.close();
+        System.out.println("Saved file to:" + saveTo.getAbsolutePath());
     }
 }

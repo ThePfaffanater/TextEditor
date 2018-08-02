@@ -25,7 +25,7 @@ public class DefaultConfig implements ITextEditorConfig {
     }
 
     @Override
-    public boolean isWrapTextEnabled() {
+    public boolean isTextWrapEnabled() {
         return wrapTextEnabled;
     }
 }
