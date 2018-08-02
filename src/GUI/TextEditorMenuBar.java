@@ -1,6 +1,7 @@
 package GUI;
 
 import Backend.ChangeDetect;
+import Backend.Config.ITextEditorConfig;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -16,13 +17,14 @@ class TextEditorMenuBar extends MenuBar {
     /**
      * Is a file bar that provides options
      *  based of the context of the
+     * @param CONFIG the Configuration of the TextEditor
      * @param tabPane is required to provide context and to allow the MenuBar to interact with the current file
      */
-    TextEditorMenuBar(FileTabPane tabPane){
+    TextEditorMenuBar(ITextEditorConfig CONFIG, final FileTabPane tabPane){
         this.tabPane = tabPane;
         this.getMenus().addAll(fileMenu(), viewMenu());
 
-        changeDetect = new ChangeDetect(tabPane);
+        changeDetect = new ChangeDetect(tabPane, CONFIG);
         changeDetect.start();
     }
 
@@ -66,7 +68,7 @@ class TextEditorMenuBar extends MenuBar {
                 try {
                     Thread.sleep(250);
                 } catch (InterruptedException e) {
-                    out.println("Sleep interrupt!!!");
+                    out.println("ERROR: Sleep interrupt");
                 }
             }
         }).start();

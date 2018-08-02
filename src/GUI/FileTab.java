@@ -13,7 +13,8 @@ public class FileTab extends Tab {
     private final ITextEditorConfig CONFIG;
     private final FileOperations fileOperations;
     private final TextArea textSpace;
-    private File lastVer; //last saved version of this text document
+    private File prevFile; //last saved version of this text document
+    private String prevText;
     private boolean hasChangedSinceSave;
     private boolean hasKeyBeenPressed;
     private static int newTabCount = 0;//keeps count of how many new tabs have been opened
@@ -55,17 +56,20 @@ public class FileTab extends Tab {
     private FileTab(String title, File preexistingFile, final ITextEditorConfig CONFIG){
         this.CONFIG = CONFIG;
         fileOperations = new FileOperations();
-        lastVer        = preexistingFile;
+        prevFile = preexistingFile;
+        prevText = "";
         String text    = "";
 
         if(title == null){
             title = ("Untitled " + ++newTabCount);
         }
-        if(lastVer != null) {
-            text  = fileOperations.readFile(lastVer);//gets all the text from the preexisting file
+        if(prevFile != null) {
+            text     = fileOperations.readFile(prevFile);//gets all the text from the preexisting file
+            prevText = text;
             hasChangedSinceSave = false;
         }else{
             hasChangedSinceSave = true;
+            prevText = null;
         }
 
         this.setText(title);         //set tab title
@@ -80,6 +84,10 @@ public class FileTab extends Tab {
 
         this.setOnCloseRequest(e -> {
             //TODO: dont let close if unsaved without confirmation
+            if(this.checkChangedFromText()){
+                System.out.println(CONFIG.ANSI_RED + " WARNING: Text closed without saving recent changes!" + CONFIG.ANSI_BLACK);
+            }
+
         });
     }
 
@@ -102,12 +110,13 @@ public class FileTab extends Tab {
      * saves the current text file using it's location/name
      */
     void save() throws IOException {
-        if(lastVer == null) {
+        if(prevFile == null) {
             throw new FileNotFoundException("There is no previous file to base this save off of!");
         }
 
         try {
-            fileOperations.saveTextFile(lastVer, this.getFileText());
+            fileOperations.saveTextFile(prevFile, this.getFileText());
+            prevText = this.getFileText();
             hasChangedSinceSave = false;
         }catch(IOException e){
             throw new IOException(CONFIG.ANSI_BLUE  + "ERROR: Attempting IO Operation of SAVE");
@@ -126,8 +135,9 @@ public class FileTab extends Tab {
 
         try {
 
-            lastVer = fileOperations.saveTextFileAs(this.getFileText());
-            this.setTabTitle(lastVer.getName());
+            prevFile = fileOperations.saveTextFileAs(this.getFileText());
+            this.setTabTitle(prevFile.getName());
+            prevText = this.getFileText();
             hasChangedSinceSave = false;
         } catch (IOException e) {
             throw new IOException("ERROR: Attempting IO Operation of SAVE_AS");
@@ -141,18 +151,31 @@ public class FileTab extends Tab {
      * @return true if current text is different from the saved version
      * Does perform a costly read of the previous text fileS.
      */
-    public boolean checkChangedFromFile(){
-        if(lastVer==null) {
+    public boolean checkFileModified(){
+        if(prevFile == null) {
+            return false;
+        }
+        else if(!fileOperations.readFile(prevFile).equals(this.prevText)){
+            return true;//if the two are not the same, the file has changed
+        }
+        return false;
+    }
+
+    /**
+     * @return true if current text is different from the last saved version
+     */
+    public boolean checkChangedFromText(){
+        if(prevText ==null) {
             this.hasChangedSinceSave = true;
-            return this.hasChangedSinceSave;//if the file has never been saved
+            return true;//if the file has never been saved
         }                                   // return false.
-        else if(!fileOperations.readFile(lastVer).equals(this.getFileText())){
+        else if(!prevText.equals(this.getFileText())){
             this.hasChangedSinceSave = true;
-            return this.hasChangedSinceSave;//if the two are not the same, the file has changed
+            return true;//if the two are not the same, the file has changed
         }
 
         this.hasChangedSinceSave = false;
-        return this.hasChangedSinceSave;
+        return false;
     }
 
     /**

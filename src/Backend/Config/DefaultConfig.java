@@ -8,8 +8,8 @@ public class DefaultConfig implements ITextEditorConfig {
     private final boolean wrapTextEnabled;
 
     public DefaultConfig(){
-        WIDTH  = 1920;
-        HEIGHT = 1080;
+        WIDTH  = 1792;
+        HEIGHT = 1008;
         wrapTextEnabled = false;
     }
 

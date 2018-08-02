@@ -13,12 +13,14 @@ public class RootGUI {
     private final TextEditorMenuBar menuBar;
 
 
-    //Init
+    /**
+     * @param CONFIG the Configuration of the TextEditor
+     */
     public RootGUI(final ITextEditorConfig CONFIG){
         root = new BorderPane();
         tabPane = new FileTabPane(CONFIG);
         TextArea textSpace = new TextArea();
-        menuBar = new TextEditorMenuBar(tabPane);
+        menuBar = new TextEditorMenuBar(CONFIG, tabPane);
     }
 
     public BorderPane getRoot() {

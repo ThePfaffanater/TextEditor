@@ -3,9 +3,13 @@ package Backend;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import static javafx.stage.FileChooser.ExtensionFilter;
 
@@ -24,18 +28,22 @@ public class FileOperations {
     }
 
     public String readFile(File file) {
-        StringBuilder output = new StringBuilder();
+        try {
+            Scanner inputFile = new Scanner(file);
 
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                output.append(line).append("\n");
+            String retrunVal = "";
+
+            inputFile.useDelimiter(System.getProperty("line.separator"));
+            while (inputFile.hasNext()) {
+                 retrunVal += (inputFile.next());
+
             }
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
 
-        return output.toString();
+            return retrunVal;
+        } catch (FileNotFoundException e) {
+            System.out.println("Can not read the file [" + file.getAbsolutePath() + "]specified.");
+            return"";
+        }
     }
 
 
@@ -61,9 +69,9 @@ public class FileOperations {
             throw new FileNotFoundException("There is no file location to save to!!!");
         }
         PrintWriter fstream = new PrintWriter(saveTo);
-        for(String line : content.split("[\\r\\n]+"))  {
-            fstream.write(line + "\r\n");
-        }
+//        for(String line : content.split(System.getProperty("line.separator")))  {
+            fstream.print(content);
+//        }
         fstream.close();
         System.out.println("Saved file to:" + saveTo.getAbsolutePath());
     }
