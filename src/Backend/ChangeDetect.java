@@ -41,20 +41,20 @@ public class ChangeDetect extends Thread{
             while(continueRun) {
                 long START_TIME   = System.currentTimeMillis();
                 if (fileTabPane.isEmpty()) {
-                    sleep(750);//so we dont spam if nothing exists
+                    Thread.sleep(750);//so we dont spam if nothing exists
                     continue;
                 }else {
                         if (fileTabPane.getCurrent().isFocused() && fileTabPane.getCurrent().hasKeyBeenPressed()) {
                             this.isChanged = fileTabPane.getCurrent().checkChangedFromFile();
                             try {
-                                sleep(50);
+                                Thread.sleep(50);
                             } catch (InterruptedException e) {
                                 System.out.println(e.getMessage());
                             }
 
                         }else this.isChanged = fileTabPane.getCurrent().isChanged();
                 }
-                sleep(Math.max(0, MIN_LOOP_TIME-(System.currentTimeMillis()-START_TIME)));//so we don't negative sleep
+                Thread.sleep(Math.max(0, MIN_LOOP_TIME-(System.currentTimeMillis()-START_TIME)));//so we don't negative sleep
             }
         }catch (InterruptedException e) {
             System.out.println(e.getMessage());

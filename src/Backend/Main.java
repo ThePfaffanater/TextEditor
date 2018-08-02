@@ -1,7 +1,8 @@
-package GUI;
+package Backend;
 
 import Backend.Config.DefaultConfig;
 import Backend.Config.ITextEditorConfig;
+import GUI.RootGUI;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -17,14 +18,14 @@ public class Main extends Application {
     private RootGUI mainGui;
 
 
-    private Main() {
+    public Main() {
         CONFIG = new DefaultConfig();
     }
 
 
     public static void main(String[] args) {
         Main main = new Main();
-        launch(args);
+        main.launch(args);
     }
 
 

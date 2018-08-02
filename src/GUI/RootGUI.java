@@ -4,7 +4,7 @@ import Backend.Config.ITextEditorConfig;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
 
-class RootGUI {
+public class RootGUI {
 
     private final BorderPane root;
 
@@ -14,14 +14,14 @@ class RootGUI {
 
 
     //Init
-    RootGUI(final ITextEditorConfig CONFIG){
+    public RootGUI(final ITextEditorConfig CONFIG){
         root = new BorderPane();
         tabPane = new FileTabPane(CONFIG);
         TextArea textSpace = new TextArea();
         menuBar = new TextEditorMenuBar(tabPane);
     }
 
-    BorderPane getRoot() {
+    public BorderPane getRoot() {
         root.setCenter(tabPane);
         root.setTop(menuBar);
         return root;

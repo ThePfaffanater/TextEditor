@@ -49,7 +49,6 @@ class TextEditorMenuBar extends MenuBar {
         //if the current version differs from it's last save allow save
         //If the current version does not differ from it's last save only allow saveAs
         new Thread(() -> {
-            //noinspection InfiniteLoopStatement
             while (true) {
                 //Disables
                 if (tabPane.isEmpty()) {
