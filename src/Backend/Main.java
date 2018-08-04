@@ -47,7 +47,7 @@ public class Main extends Application {
 
 
         window.setOnCloseRequest(e -> {
-            System.out.println(CONFIG.ANSI_BLUE + "Process finishing...");
+            System.out.println(CONFIG.ANSI_BLUE + "Process finishing..." + CONFIG.ANSI_RESET);
             Platform.exit();
             System.exit(0);
         });

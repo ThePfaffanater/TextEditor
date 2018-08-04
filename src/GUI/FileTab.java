@@ -55,7 +55,7 @@ public class FileTab extends Tab {
      */
     private FileTab(String title, File preexistingFile, final ITextEditorConfig CONFIG){
         this.CONFIG = CONFIG;
-        fileOperations = new FileOperations();
+        fileOperations = new FileOperations(CONFIG);
         prevFile = preexistingFile;
         prevText = "";
         String text    = "";
@@ -82,10 +82,16 @@ public class FileTab extends Tab {
 
         textSpace.setOnKeyReleased((e -> this.hasKeyBeenPressed = true));
 
+        if(this.prevFile !=null){
+            System.out.println(CONFIG.getNotificationColor() + "Opening new tab " + this.getTabTitle() + " from " + this.prevFile.getAbsolutePath() + CONFIG.ANSI_RESET);
+        }else{
+            System.out.println(CONFIG.getNotificationColor() + "Opening new tab " + this.getTabTitle() + " from " + "null "                         + CONFIG.ANSI_RESET);
+        }
+
         this.setOnCloseRequest(e -> {
             //TODO: dont let close if unsaved without confirmation
             if(this.checkChangedFromText()){
-                System.out.println(CONFIG.ANSI_RED + " WARNING: Text closed without saving recent changes!" + CONFIG.ANSI_BLACK);
+                System.out.println(CONFIG.getWarningColor() + " WARNING: Text closed without saving recent changes!" + CONFIG.ANSI_RESET);
             }
 
         });
@@ -111,7 +117,7 @@ public class FileTab extends Tab {
      */
     void save() throws IOException {
         if(prevFile == null) {
-            throw new FileNotFoundException("There is no previous file to base this save off of!");
+            throw new FileNotFoundException(CONFIG.getWarningColor() + "There is no previous file to base this save off of!" + CONFIG.ANSI_RESET);
         }
 
         try {
@@ -119,9 +125,9 @@ public class FileTab extends Tab {
             prevText = this.getFileText();
             hasChangedSinceSave = false;
         }catch(IOException e){
-            throw new IOException(CONFIG.ANSI_BLUE  + "ERROR: Attempting IO Operation of SAVE");
+            throw new IOException(CONFIG.getErrorColor() + "ERROR: Attempting IO Operation of SAVE" + CONFIG.ANSI_RESET);
         }catch (NullPointerException e){
-            System.out.println(CONFIG.ANSI_BLUE + "ERROR: SOMETHING THAT YOU ARE TRYING TO ACCESS DOES NOT EXIST!");
+            System.out.println(CONFIG.getErrorColor() + "ERROR: SOMETHING THAT YOU ARE TRYING TO ACCESS DOES NOT EXIST!" + CONFIG.ANSI_RESET);
         }
     }
 
@@ -131,7 +137,7 @@ public class FileTab extends Tab {
      */
     public void saveAs() throws IOException, NullPointerException {
 
-        FileOperations fileOperations = new FileOperations();
+        FileOperations fileOperations = new FileOperations(CONFIG);
 
         try {
 
@@ -140,9 +146,9 @@ public class FileTab extends Tab {
             prevText = this.getFileText();
             hasChangedSinceSave = false;
         } catch (IOException e) {
-            throw new IOException("ERROR: Attempting IO Operation of SAVE_AS");
+            throw new IOException(CONFIG.getErrorColor() + "ERROR: Attempting IO Operation of SAVE_AS" + CONFIG.ANSI_RESET);
         } catch (NullPointerException e){
-            System.out.println("ERROR: SOMETHING THAT YOU ARE TRYING TO ACCESS DOES NOT EXIST!");
+            System.out.println(CONFIG.getErrorColor() + "ERROR: SOMETHING THAT YOU ARE TRYING TO ACCESS DOES NOT EXIST!" + CONFIG.ANSI_RESET);
             e.printStackTrace();
         }
     }

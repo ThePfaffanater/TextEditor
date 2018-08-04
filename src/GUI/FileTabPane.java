@@ -35,7 +35,7 @@ public class FileTabPane extends TabPane {
        try {
             getCurrent().save();
         } catch (FileNotFoundException e) {
-            System.out.println("Performing a SaveAs instead:");
+            System.out.println(CONFIG.getNotificationColor() + "Performing a SaveAs instead:" + CONFIG.ANSI_RESET);
             saveCurrentAs();
         } catch (IOException e) {
             System.out.println(e.getMessage());
@@ -50,7 +50,7 @@ public class FileTabPane extends TabPane {
         try {
             getCurrent().saveAs();
         } catch (IOException | NullPointerException e) {
-            System.out.println(e.getMessage());
+            System.out.println(CONFIG.getErrorColor() + e.getMessage() + CONFIG.ANSI_RESET);
         }
 
     }
@@ -68,14 +68,14 @@ public class FileTabPane extends TabPane {
      */
     void newTabFromPreexistingFile(){
         try{
-            FileOperations fileOperations = new FileOperations();
+            FileOperations fileOperations = new FileOperations(CONFIG);
             ArrayList<File> files = fileOperations.openTextFiles(); //list of files chosen to open
             for (File file : files){
                 FileTab newTextFile = new FileTab(file,CONFIG);
                 this.getTabs().add(newTextFile);
             }
         }catch (java.lang.NullPointerException e){
-            System.out.println("Error attempting to Open new file! The file probably doesn't exist somehow?");
+            System.out.println(CONFIG.getErrorColor() + "Error attempting to Open new file! The file probably doesn't exist somehow?" + CONFIG.ANSI_RESET);
         }
     }
 

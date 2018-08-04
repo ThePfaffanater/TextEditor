@@ -7,12 +7,11 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 
-import static java.lang.System.out;
-
 class TextEditorMenuBar extends MenuBar {
 
     private final FileTabPane tabPane;
     private final ChangeDetect changeDetect;
+    private final ITextEditorConfig CONFIG;
 
     /**
      * Is a file bar that provides options
@@ -20,7 +19,8 @@ class TextEditorMenuBar extends MenuBar {
      * @param CONFIG the Configuration of the TextEditor
      * @param tabPane is required to provide context and to allow the MenuBar to interact with the current file
      */
-    TextEditorMenuBar(ITextEditorConfig CONFIG, final FileTabPane tabPane){
+    TextEditorMenuBar(final ITextEditorConfig CONFIG, final FileTabPane tabPane){
+        this.CONFIG  = CONFIG;
         this.tabPane = tabPane;
         this.getMenus().addAll(fileMenu(), viewMenu());
 
@@ -68,7 +68,7 @@ class TextEditorMenuBar extends MenuBar {
                 try {
                     Thread.sleep(250);
                 } catch (InterruptedException e) {
-                    out.println("ERROR: Sleep interrupt");
+                    System.out.println(CONFIG.getErrorColor() + "ERROR: Sleep interrupt" + CONFIG.ANSI_RESET);
                 }
             }
         }).start();
@@ -85,7 +85,6 @@ class TextEditorMenuBar extends MenuBar {
     }
 
     private void handle(ActionEvent e) {
-        out.println("Attempting to open file");
         tabPane.newTabFromPreexistingFile();
     }
 }

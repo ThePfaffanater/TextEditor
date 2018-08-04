@@ -15,6 +15,21 @@ public class DefaultConfig implements ITextEditorConfig {
 
 
     @Override
+    public String getErrorColor() {
+        return this.ANSI_RED;
+    }
+
+    @Override
+    public String getWarningColor() {
+        return this.ANSI_YELLOW;
+    }
+
+    @Override
+    public String getNotificationColor() {
+        return this.ANSI_GREEN;
+    }
+
+    @Override
     public int getInitialWidth() {
         return WIDTH;
     }

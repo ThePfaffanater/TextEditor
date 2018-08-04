@@ -1,5 +1,6 @@
 package Backend;
 
+import Backend.Config.ITextEditorConfig;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -15,8 +16,14 @@ import static javafx.stage.FileChooser.ExtensionFilter;
 
 public class FileOperations {
 
-    private final Stage stage = new Stage();
-    File lastFile = null;
+    private final ITextEditorConfig CONFIG;
+    private final Stage stage;
+
+    public FileOperations(ITextEditorConfig CONFIG){
+        this.CONFIG = CONFIG;
+        stage = new Stage();
+
+    }
 
     public ArrayList<File> openTextFiles(){
         final FileChooser fileChooser = new FileChooser();
@@ -41,11 +48,10 @@ public class FileOperations {
 
             return retrunVal;
         } catch (FileNotFoundException e) {
-            System.out.println("Can not read the file [" + file.getAbsolutePath() + "]specified.");
-            return"";
+            System.out.println(CONFIG.getErrorColor() + "Can not read/find the file [" + file.getAbsolutePath() + "]specified." + CONFIG.ANSI_RESET);
+            return"";//TODO: fix this so it just throws and does nothing
         }
     }
-
 
     /**
      * Will do the same as saveTextFile but will queuery the user
@@ -66,13 +72,11 @@ public class FileOperations {
 
     public void saveTextFile(File saveTo, String content) throws IOException {
         if(saveTo==null){
-            throw new FileNotFoundException("There is no file location to save to!!!");
+            throw new FileNotFoundException(CONFIG.getErrorColor() + "There is no file location to save to!!!" + CONFIG.ANSI_RESET);
         }
         PrintWriter fstream = new PrintWriter(saveTo);
-//        for(String line : content.split(System.getProperty("line.separator")))  {
-            fstream.print(content);
-//        }
+        fstream.print(content);
         fstream.close();
-        System.out.println("Saved file to:" + saveTo.getAbsolutePath());
+        System.out.println(CONFIG.getNotificationColor() + "Saved file to:" + saveTo.getAbsolutePath() + CONFIG.ANSI_RESET);
     }
 }

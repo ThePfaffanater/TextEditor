@@ -20,6 +20,11 @@ public interface ITextEditorConfig {
     String ANSI_CYAN_BACKGROUND = "\u001B[46m";
     String ANSI_WHITE_BACKGROUND = "\u001B[47m";
 
+    String getErrorColor();
+
+    String getWarningColor();
+
+    String getNotificationColor();
 
     int getInitialWidth();
 
